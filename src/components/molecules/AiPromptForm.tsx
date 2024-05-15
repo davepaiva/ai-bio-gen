@@ -42,8 +42,6 @@ const AiPromptForm = () => {
 	const [formResult, setFormResult] = useState<IGenerateBioResponse>();
 	const { toast } = useToast();
 
-	console.log("formResult", formResult);
-
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -62,7 +60,6 @@ const AiPromptForm = () => {
 				temperature: parseInt(values.temperature || "0.7"),
 				bio: values.prompt,
 			});
-			console.log("result: ", result);
 			if (result) {
 				setFormResult(result);
 				toast({
@@ -156,7 +153,8 @@ const AiPromptForm = () => {
 										</FormDescription>
 										<Select
 											onValueChange={field.onChange}
-											defaultValue={`${field.value}`}
+											defaultValue={"0.7"}
+											value={field.value}
 										>
 											<FormControl>
 												<SelectTrigger>
@@ -169,7 +167,7 @@ const AiPromptForm = () => {
 													(_, i) => (i + 1) * 0.1
 												).map((value) => (
 													<SelectItem key={value} value={`${value}`}>
-														{value.toFixed(1)}
+														{value.toFixed(1).toString()}
 													</SelectItem>
 												))}
 											</SelectContent>

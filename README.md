@@ -14,6 +14,25 @@ pnpm dev
 bun dev
 ```
 
+Add `.env` file
+
+Example env file is
+
+```
+DATABASE_URL=
+OPEN_AI_API_KEY=
+OPEN_AI_API_URL=https://api.openai.com/v1/chat/completions
+OPEN_AI_MODEL=gpt-3.5-turbo
+JWT_SECRET=secret
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+BASE_API_URL=http://localhost:3000
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.

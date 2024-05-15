@@ -1,5 +1,11 @@
+import AiPromptForm from "@/components/molecules/AiPromptForm";
+
 const HomePage = () => {
-	return <div>Home</div>;
+	return (
+		<div>
+			<AiPromptForm />
+		</div>
+	);
 };
 
 export default HomePage;

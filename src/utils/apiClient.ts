@@ -1,6 +1,10 @@
 "use client";
 
 import { IAuthRequest, IAuthResponse } from "@/app/api/auth/route";
+import {
+	IGenerateBioRequest,
+	IGenerateBioResponse,
+} from "@/app/api/generate-bio/route";
 import { useUserStore } from "@/store/user";
 import axios, { AxiosResponse } from "axios";
 
@@ -14,7 +18,9 @@ if (typeof window !== "undefined") {
 	] = `Bearer ${localStorage.getItem("access_token")}`;
 }
 
-export const getAccessToken = async (authRequest: IAuthRequest) => {
+export const getAccessToken: (
+	authRequest: IAuthRequest
+) => Promise<IAuthResponse> = async (authRequest: IAuthRequest) => {
 	try {
 		const response: AxiosResponse<IAuthResponse, IAuthRequest> =
 			await apiClient.post("/api/auth", {
@@ -36,6 +42,26 @@ export const getAccessToken = async (authRequest: IAuthRequest) => {
 			"Authorization"
 		] = `Bearer ${response.data.data.token}`;
 
+		return response.data;
+	} catch (error) {
+		console.error("Error sending POST request:", error);
+		throw error;
+	}
+};
+
+export const generateBio: (
+	authRequest: IGenerateBioRequest
+) => Promise<IGenerateBioResponse> = async ({
+	bio,
+	tone,
+	temperature,
+}: IGenerateBioRequest) => {
+	try {
+		const response = await apiClient.post("/api/generate-bio", {
+			bio,
+			tone,
+			temperature,
+		});
 		return response.data;
 	} catch (error) {
 		console.error("Error sending POST request:", error);

@@ -15,7 +15,7 @@ export async function logOpenAiApiCall(
 	try {
 		return await prisma.openAiApiLog.create({
 			data: {
-				reqquest_data: requestData,
+				request_data: requestData,
 				response_data: responseData,
 				user_id: userId,
 				is_success: isSuccess,
@@ -34,18 +34,6 @@ export async function logOpenAiApiCall(
         `
 		);
 	}
-}
-
-export async function getServerLogs(page: number, pageSize: number) {
-	const skip = (page - 1) * pageSize;
-	const logs = await prisma.openAiApiLog.findMany({
-		skip: skip,
-		take: pageSize,
-		orderBy: {
-			timestamp: "desc",
-		},
-	});
-	return logs;
 }
 
 export const checkSystemResponseStatus = (finishReason: FinishReason) => {

@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider       = "prisma-client-js"
   previewFeature = ["mongodb"]
 }
 
@@ -15,18 +15,30 @@ datasource db {
 }
 
 model OpenAiApiLog {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  timestamp DateTime @default(now())
-  user_id String
-  reqquest_data Json
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  timestamp     DateTime @default(now())
+  user_id       String
+  request_data  Json
   response_data Json
-  is_success Boolean
+  is_success    Boolean
+}
+
+model UserHistory {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id             String   @db.ObjectId
+  input_text          String
+  temperature         Float
+  tone                String
+  bio                 String
+  generated_usernames String[]
+  logId               String   @db.ObjectId
+  timestamp           DateTime @default(now())
 }
 
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  email String @unique
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String   @unique
   profile_pic_url String
-  last_loggedin DateTime @default(now())
+  last_loggedin   DateTime @default(now())
 }

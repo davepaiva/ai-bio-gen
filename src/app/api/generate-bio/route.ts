@@ -3,12 +3,31 @@ import axios, { AxiosResponse } from "axios";
 import {
 	FinishReason,
 	checkSystemResponseStatus,
-	getServerLogs,
 	logOpenAiApiCall,
 } from "@/utils/logApiCall";
 import { JsonObject } from "@prisma/client/runtime/react-native.js";
 import { sendResponse } from "@/utils/apiResponseFormatter";
 import { OpenAIResponseSchema } from "@/zod-schema/openAiApiSchema";
+import { PrismaClient } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
+
+export interface IGenerateBioRequest {
+	bio: string;
+	tone: string;
+	temperature: number;
+}
+
+export interface IGenerateBioResponse {
+	code: string;
+	message: string;
+	data: {
+		id: string;
+		result: {
+			bio: string;
+			generated_usernames: string[];
+		};
+	};
+}
 
 interface IOpenAIResponseBody {
 	id: string;
@@ -32,9 +51,12 @@ interface IOpenAIResponseBody {
 	system_fingerprint: any;
 }
 
+const prisma = new PrismaClient();
+
 export const POST = async (req: NextRequest) => {
 	const { bio, tone, temperature = 0.7 } = await req.json();
-	const user_id = "dave";
+	const user = JSON.parse(req.headers.get("user") || "{}");
+	const user_id = user.userId;
 
 	const systemPrompt = `Generate a social media profile bio and suggested 3 usernames based on the user bio input and tone input:
   The response should be in JSON format. With keys "bio" for the generated profile bio & "generated_usernames" for the genrated usernames.
@@ -79,7 +101,7 @@ export const POST = async (req: NextRequest) => {
 			});
 		}
 
-		await logOpenAiApiCall(
+		const logResult = await logOpenAiApiCall(
 			payload,
 			openAiResponse as any as JsonObject,
 			user_id,
@@ -89,13 +111,32 @@ export const POST = async (req: NextRequest) => {
 			)
 		);
 
+		await prisma.userHistory.create({
+			data: {
+				logId: logResult?.id || uuidv4(),
+				user_id: user_id,
+				tone: tone,
+				temperature: temperature,
+				generated_usernames: JSON.parse(
+					openAiResponse.choices[0].message.content || "{}"
+				).generated_usernames,
+				bio: bio,
+				input_text: userPrompt,
+			},
+		});
+
 		// excpected output as per API docs example https://platform.openai.com/docs/guides/text-generation/chat-completions-response-format
 		switch (openAiResponse.choices[0].finish_reason) {
 			case "stop":
 				return sendResponse({
 					code: "SUCCESS",
 					message: "success",
-					data: JSON.parse(openAiResponse.choices[0].message.content || "{}"),
+					data: {
+						id: logResult?.id,
+						result: JSON.parse(
+							openAiResponse.choices[0].message.content || "{}"
+						),
+					},
 				});
 			case "max_tokens":
 				return sendResponse({
@@ -122,12 +163,35 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
 	try {
+		const user = JSON.parse(req.headers.get("user") || "{}");
+		console.log("user", user);
+		const user_id = user.id;
 		const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
 		const pageSize = parseInt(
 			req.nextUrl.searchParams.get("pageSize") || "10",
 			10
 		);
-		const logs = await getServerLogs(page, pageSize);
+		const skip = (page - 1) * pageSize;
+
+		const logs = await prisma.userHistory.findMany({
+			skip: skip,
+			take: pageSize,
+			select: {
+				id: true,
+				timestamp: true,
+				bio: true,
+				generated_usernames: true,
+				tone: true,
+				temperature: true,
+				input_text: true,
+			},
+			where: {
+				user_id: user_id,
+			},
+			orderBy: {
+				timestamp: "desc",
+			},
+		});
 		return sendResponse({
 			code: "SUCCESS",
 			message: "success",

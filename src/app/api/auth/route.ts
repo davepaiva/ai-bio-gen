@@ -5,6 +5,28 @@ import { sendResponse } from "@/utils/apiResponseFormatter";
 
 const prisma = new PrismaClient();
 
+interface User {
+	id: string;
+	name: string;
+	email: string;
+	profile_pic_url: string;
+}
+
+export interface IAuthResponse {
+	code: string;
+	message: string;
+	data: {
+		token: string;
+		user: User;
+	};
+}
+
+export interface IAuthRequest {
+	name: string;
+	email: string;
+	profile_pic_url: string;
+}
+
 export const POST = async (req: NextRequest) => {
 	try {
 		const { name, email, profile_pic_url } = await req.json();
@@ -25,10 +47,19 @@ export const POST = async (req: NextRequest) => {
 		return sendResponse({
 			code: "SUCCESS",
 			message: "User authenticated successfully",
-			data: { token },
+			data: {
+				token,
+				user: {
+					id: user.id,
+					name: user.name,
+					email: user.email,
+					profile_pic_url: user.profile_pic_url,
+				},
+			},
 			status: 200,
 		});
 	} catch (error) {
+		console.log("error: ", error);
 		return sendResponse({
 			code: "ERROR",
 			message: "Error processing your request",

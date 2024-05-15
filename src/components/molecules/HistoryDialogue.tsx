@@ -23,6 +23,7 @@ const HistoryDialogue = ({
 				<div>
 					<h1 className="text-2xl">Input</h1>
 					<p className="text-sm">{historyItem?.input_text}</p>
+					<p className="text-sm">{`Temperature: ${historyItem?.temperature}`}</p>
 				</div>
 				<div>
 					<h1 className="text-2xl">Output</h1>

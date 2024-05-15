@@ -16,8 +16,6 @@ const HomePage = () => {
 	const { selectedHistoryItem, isDialogueOpen, setIsDialogueOpen } =
 		useHistoryDetails();
 
-	console.log("historyList0: ", historyList);
-
 	useEffect(() => {
 		const fetchHistory = async () => {
 			const history = await getHistory();

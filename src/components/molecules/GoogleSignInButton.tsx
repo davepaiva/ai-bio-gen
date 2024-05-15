@@ -30,7 +30,6 @@ const GoogleSignInButton = ({ className }: { className: string }) => {
 			}
 		} catch (error) {
 			const err = error as FirebaseError;
-			console.error(err);
 			if (err.code === "auth/popup-closed-by-user-action") {
 				toast({
 					title: "Sign in cancelled",

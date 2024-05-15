@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 
 import { useSheetStore } from "@/store/sheet";
 import { useGetUserHistory } from "@/store/historyList";
-import { IHistoryItem } from "@/app/api/generate-bio/route";
 import { useHistoryDetails } from "@/store/historyDetails";
 
 const HistoryList = () => {

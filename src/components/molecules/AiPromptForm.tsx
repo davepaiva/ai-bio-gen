@@ -57,18 +57,20 @@ const AiPromptForm = () => {
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			const result = await generateBio({
+			const formattedTemperature = parseFloat(values.temperature).toFixed(1);
+			const payload = {
 				tone: values.tone,
-				temperature: parseInt(values.temperature || "0.7"),
+				temperature: parseFloat(formattedTemperature),
 				bio: values.prompt,
-			});
+			};
+			const result = await generateBio(payload);
 			if (result) {
 				setFormResult(result);
 				addHistoryItem({
 					id: result.data.id,
 					timestamp: result.data.timestamp,
 					input_text: values.prompt,
-					temperature: parseInt(values.temperature),
+					temperature: parseFloat(formattedTemperature),
 					tone: values.tone,
 					bio: result.data.result.bio,
 					generated_usernames: result.data.result.generated_usernames,

@@ -8,7 +8,7 @@ import {
 } from "@/utils/logApiCall";
 import { JsonObject } from "@prisma/client/runtime/react-native.js";
 import { sendResponse } from "@/utils/apiResponseFormatter";
-import { OpenAIResponseSchema } from "@/schema/openAiApiSchema";
+import { OpenAIResponseSchema } from "@/zod-schema/openAiApiSchema";
 
 interface IOpenAIResponseBody {
 	id: string;
@@ -72,10 +72,9 @@ export const POST = async (req: NextRequest) => {
 		const schemaValidationResult =
 			OpenAIResponseSchema.safeParse(openAiResponse);
 		if (!schemaValidationResult.success) {
-			console.error("Validation error:", schemaValidationResult.error);
 			return sendResponse({
 				code: "VALIDATION_ERROR",
-				message: "Response validation failed",
+				message: `Response validation failed with error ${schemaValidationResult.error}`,
 				status: 400,
 			});
 		}

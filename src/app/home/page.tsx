@@ -1,6 +1,8 @@
 "use client";
 import AiPromptForm from "@/components/molecules/AiPromptForm";
+import HistoryDialogue from "@/components/molecules/HistoryDialogue";
 import HistoryList from "@/components/molecules/HistoryList";
+import { useHistoryDetails } from "@/store/historyDetails";
 import { useGetUserHistory } from "@/store/historyList";
 import { useUserStore } from "@/store/user";
 import { getHistory } from "@/utils/apiClient";
@@ -11,6 +13,8 @@ const HomePage = () => {
 	const user = useUserStore((state) => state.user);
 	const router = useRouter();
 	const { setHistoryList, historyList } = useGetUserHistory();
+	const { selectedHistoryItem, isDialogueOpen, setIsDialogueOpen } =
+		useHistoryDetails();
 
 	console.log("historyList0: ", historyList);
 
@@ -29,14 +33,21 @@ const HomePage = () => {
 	}, [user, router]);
 
 	return (
-		<div className="flex">
-			<div className="hidden flex-5 lg:block">
-				<HistoryList />
+		<>
+			<div className="flex">
+				<div className="hidden flex-5 lg:block">
+					<HistoryList />
+				</div>
+				<div className="flex-1 pl-[8px]">
+					<AiPromptForm />
+				</div>
 			</div>
-			<div className="flex-1 pl-[8px]">
-				<AiPromptForm />
-			</div>
-		</div>
+			<HistoryDialogue
+				open={isDialogueOpen}
+				onOpenChange={setIsDialogueOpen}
+				historyItem={selectedHistoryItem}
+			/>
+		</>
 	);
 };
 

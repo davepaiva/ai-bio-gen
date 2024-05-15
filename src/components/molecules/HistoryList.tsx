@@ -5,22 +5,19 @@ import { Separator } from "@/components/ui/separator";
 
 import { useSheetStore } from "@/store/sheet";
 import { useGetUserHistory } from "@/store/historyList";
-import HistoryDialogue from "./HistoryDialogue";
 import { IHistoryItem } from "@/app/api/generate-bio/route";
+import { useHistoryDetails } from "@/store/historyDetails";
 
 const HistoryList = () => {
 	const { setIsSheetOpen } = useSheetStore();
 	const { historyList } = useGetUserHistory();
-	const [open, setOpen] = React.useState(false);
-	const [historyItem, setHistoryItem] = React.useState<IHistoryItem>();
-
-	console.log("historyList", historyList);
+	const { setSelectedHistoryItem, setIsDialogueOpen } = useHistoryDetails();
 
 	const handleCloseSheet = React.useCallback(
 		(index: number) => {
 			setIsSheetOpen(false);
-			setHistoryItem(historyList[index]);
-			setOpen(true);
+			setSelectedHistoryItem(historyList[index]);
+			setIsDialogueOpen(true);
 		},
 		[setIsSheetOpen, historyList]
 	);
@@ -41,11 +38,6 @@ const HistoryList = () => {
 					</React.Fragment>
 				))}
 			</ScrollArea>
-			<HistoryDialogue
-				open={open}
-				onOpenChange={setOpen}
-				historyItem={historyItem}
-			/>
 		</div>
 	);
 };

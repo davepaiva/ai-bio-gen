@@ -8,6 +8,7 @@ import {
 } from "@/utils/logApiCall";
 import { JsonObject } from "@prisma/client/runtime/react-native.js";
 import { sendResponse } from "@/utils/apiResponseFormatter";
+import { OpenAIResponseSchema } from "@/schema/openAiApiSchema";
 
 interface IOpenAIResponseBody {
 	id: string;
@@ -67,30 +68,27 @@ export const POST = async (req: NextRequest) => {
 		};
 		const response: AxiosResponse<IOpenAIResponseBody> = await axios(payload);
 		const openAiResponse = response.data;
-		try {
-			// error in logging should not affect the rest if the api, instead print it out
-			await logOpenAiApiCall(
-				payload,
-				openAiResponse as any as JsonObject,
-				user_id,
-				checkSystemResponseStatus(
-					(openAiResponse.choices[0].finish_reason as FinishReason) ||
-						("none" as FinishReason)
-				)
-			);
-		} catch (error) {
-			console.log(
-				"ERROR data:",
-				`user_id: ${user_id}
-			------
-			payload ${payload}
-			-----
-			response ${openAiResponse}
-			-----
-			error ${error}
-			`
-			);
+
+		const schemaValidationResult =
+			OpenAIResponseSchema.safeParse(openAiResponse);
+		if (!schemaValidationResult.success) {
+			console.error("Validation error:", schemaValidationResult.error);
+			return sendResponse({
+				code: "VALIDATION_ERROR",
+				message: "Response validation failed",
+				status: 400,
+			});
 		}
+
+		await logOpenAiApiCall(
+			payload,
+			openAiResponse as any as JsonObject,
+			user_id,
+			checkSystemResponseStatus(
+				(openAiResponse.choices[0].finish_reason as FinishReason) ||
+					("none" as FinishReason)
+			)
+		);
 
 		// excpected output as per API docs example https://platform.openai.com/docs/guides/text-generation/chat-completions-response-format
 		switch (openAiResponse.choices[0].finish_reason) {

@@ -3,53 +3,49 @@ import * as React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
-import { List } from "react-virtualized";
 import { useSheetStore } from "@/store/sheet";
-
-const tags = Array.from({ length: 50 }).map(
-	(_, i, a) => `v1.2.0-beta.${a.length - i}`
-);
+import { useGetUserHistory } from "@/store/historyList";
+import HistoryDialogue from "./HistoryDialogue";
+import { IHistoryItem } from "@/app/api/generate-bio/route";
 
 const HistoryList = () => {
 	const { setIsSheetOpen } = useSheetStore();
+	const { historyList } = useGetUserHistory();
+	const [open, setOpen] = React.useState(false);
+	const [historyItem, setHistoryItem] = React.useState<IHistoryItem>();
+
+	console.log("historyList", historyList);
 
 	const handleCloseSheet = React.useCallback(
 		(index: number) => {
-			console.log(`Closing sheet for item at index ${index}`);
 			setIsSheetOpen(false);
+			setHistoryItem(historyList[index]);
+			setOpen(true);
 		},
-		[setIsSheetOpen]
+		[setIsSheetOpen, historyList]
 	);
 
-	function rowRenderer({
-		key, // Unique key within array of rows
-		index, // Index of row within collection
-	}: any) {
-		const handleClick = () => {
-			handleCloseSheet(index);
-		};
-		return (
-			<>
-				<a onClick={handleClick} className={`py-[20px] text-sm `} key={key}>
-					{tags[index]}
-				</a>
-				<Separator />
-			</>
-		);
-	}
-
 	return (
-		<div className="p-4">
+		<div className="p-4 w-[200px]">
 			<h4 className="mb-4 text-sm font-medium">History</h4>
-			<List
-				style={{ height: "90vh" }}
-				width={200}
-				height={100}
-				rowCount={tags.length}
-				rowHeight={20}
-				rowRenderer={rowRenderer}
+			<ScrollArea className="z-10 " style={{ height: "70vh" }}>
+				{historyList.map((item, index) => (
+					<React.Fragment key={index}>
+						<a
+							onClick={() => handleCloseSheet(index)}
+							className="py-[20px] text-sm"
+						>
+							{item.bio}
+						</a>
+						<Separator />
+					</React.Fragment>
+				))}
+			</ScrollArea>
+			<HistoryDialogue
+				open={open}
+				onOpenChange={setOpen}
+				historyItem={historyItem}
 			/>
-			,
 		</div>
 	);
 };

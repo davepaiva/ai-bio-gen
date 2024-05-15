@@ -26,6 +26,7 @@ import {
 } from "../ui/select";
 import { useState } from "react";
 import { IGenerateBioResponse } from "@/app/api/generate-bio/route";
+import { useGetUserHistory } from "@/store/historyList";
 
 const toneEnumArray = ["funny", "professional", "sarcastic", "quirky"] as const;
 
@@ -41,6 +42,7 @@ export const formSchema = z.object({
 const AiPromptForm = () => {
 	const [formResult, setFormResult] = useState<IGenerateBioResponse>();
 	const { toast } = useToast();
+	const { addHistoryItem } = useGetUserHistory();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -62,6 +64,15 @@ const AiPromptForm = () => {
 			});
 			if (result) {
 				setFormResult(result);
+				addHistoryItem({
+					id: result.data.id,
+					timestamp: result.data.timestamp,
+					input_text: values.prompt,
+					temperature: parseInt(values.temperature),
+					tone: values.tone,
+					bio: result.data.result.bio,
+					generated_usernames: result.data.result.generated_usernames,
+				});
 				toast({
 					title: "Bio and username generated",
 				});
@@ -79,6 +90,10 @@ const AiPromptForm = () => {
 	return (
 		<>
 			<div>
+				<div className="flex justify-center mb-[32px]">
+					<h1 className="text-2xl font-bold">Generate a bio and username</h1>
+				</div>
+
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}

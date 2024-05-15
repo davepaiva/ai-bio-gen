@@ -4,6 +4,7 @@ import { IAuthRequest, IAuthResponse } from "@/app/api/auth/route";
 import {
 	IGenerateBioRequest,
 	IGenerateBioResponse,
+	IHistoryListResponse,
 } from "@/app/api/generate-bio/route";
 import { useUserStore } from "@/store/user";
 import axios, { AxiosResponse } from "axios";
@@ -28,7 +29,6 @@ export const getAccessToken: (
 				email: authRequest.email,
 				profile_pic_url: authRequest.profile_pic_url,
 			} as IAuthRequest);
-		console.log("res: ", response.data);
 		useUserStore.setState({
 			user: {
 				name: response.data.data.user.name,
@@ -65,6 +65,16 @@ export const generateBio: (
 		return response.data;
 	} catch (error) {
 		console.error("Error sending POST request:", error);
+		throw error;
+	}
+};
+
+export const getHistory: () => Promise<IHistoryListResponse> = async () => {
+	try {
+		const response = await apiClient.get("/api/generate-bio");
+		return response.data;
+	} catch (error) {
+		console.error("Error sending GET request:", error);
 		throw error;
 	}
 };

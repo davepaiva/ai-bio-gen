@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
 
 	return (
 		<>
-			<nav className=" absolute top-0 left-0 right-0 bg-white shadow-lg p-4 sticky">
+			<nav className="top-0 left-0 right-0 bg-white shadow-lg p-4 sticky">
 				<div className="flex justify-between items-center">
 					<a href="#" className="flex items-center">
 						<span className="font-semibold text-gray-950 text-xl">

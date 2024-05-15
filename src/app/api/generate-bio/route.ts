@@ -22,11 +22,27 @@ export interface IGenerateBioResponse {
 	message: string;
 	data: {
 		id: string;
+		timestamp: string;
 		result: {
 			bio: string;
 			generated_usernames: string[];
 		};
 	};
+}
+
+export interface IHistoryListResponse {
+	code: string;
+	message: string;
+	data: IHistoryItem[];
+}
+export interface IHistoryItem {
+	id: string;
+	timestamp: string;
+	bio: string;
+	generated_usernames: string[];
+	tone: string;
+	temperature: number;
+	input_text: string;
 }
 
 interface IOpenAIResponseBody {
@@ -136,6 +152,7 @@ export const POST = async (req: NextRequest) => {
 						result: JSON.parse(
 							openAiResponse.choices[0].message.content || "{}"
 						),
+						timestamp: logResult?.timestamp,
 					},
 				});
 			case "max_tokens":

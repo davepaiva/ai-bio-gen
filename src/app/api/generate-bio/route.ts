@@ -164,7 +164,6 @@ export const POST = async (req: NextRequest) => {
 export const GET = async (req: NextRequest) => {
 	try {
 		const user = JSON.parse(req.headers.get("user") || "{}");
-		console.log("user", user);
 		const user_id = user.id;
 		const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10);
 		const pageSize = parseInt(

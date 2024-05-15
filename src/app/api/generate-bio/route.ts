@@ -78,7 +78,7 @@ export const POST = async (req: NextRequest) => {
   The response should be in JSON format. With keys "bio" for the generated profile bio & "generated_usernames" for the genrated usernames.
   Give username values as a n array of strings ie. ['@username1', '@username2', '@username3']`;
 
-	const userPrompt = `Bio: ${bio}, Tone: ${tone}`;
+	const userPrompt = `Bio: ${bio}, make the tone of the bio: ${tone}`;
 
 	try {
 		const payload = {
@@ -136,7 +136,7 @@ export const POST = async (req: NextRequest) => {
 				generated_usernames: JSON.parse(
 					openAiResponse.choices[0].message.content || "{}"
 				).generated_usernames,
-				bio: bio,
+				bio: JSON.parse(openAiResponse.choices[0].message.content || "{}").bio,
 				input_text: userPrompt,
 			},
 		});
